@@ -1,6 +1,7 @@
 # kube-oidc-proxy
 
 - This is a fork of [TremoloSecurity/kube-oidc-proxy](https://github.com/TremoloSecurity/kube-oidc-proxy) which is a fork of the now archive repo - `jetstack/kube-oidc-proxy`.
+- After built, the image has been pushed to `https://hub.docker.com/repository/docker/icadariuqlik/kube-oidc-proxy/general`
 
 `kube-oidc-proxy` is a reverse proxy server to authenticate users using OIDC to
 Kubernetes API servers where OIDC authentication is not available (i.e. managed

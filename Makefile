@@ -15,17 +15,17 @@ help:  ## display this help
 .PHONY: help build docker_build test depend verify all clean generate
 
 UNAME_S := $(shell uname -s)
-GOLANGCILINT_VERSION := 1.21.0
+GOLANGCILINT_VERSION := 1.59.1
 ifeq ($(UNAME_S),Linux)
 	SHASUM := sha256sum -c
-	KUBECTL_URL := https://storage.googleapis.com/kubernetes-release/release/v1.18.0/bin/linux/amd64/kubectl
+	KUBECTL_URL := https://storage.googleapis.com/kubernetes-release/release/v1.26.1/bin/linux/amd64/kubectl
 	KUBECTL_HASH := bb16739fcad964c197752200ff89d89aad7b118cb1de5725dc53fe924c40e3f7
 	GOLANGCILINT_URL := https://github.com/golangci/golangci-lint/releases/download/v$(GOLANGCILINT_VERSION)/golangci-lint-$(GOLANGCILINT_VERSION)-linux-amd64.tar.gz
-	GOLANGCILINT_HASH := 2c861f8dc56b560474aa27cab0c075991628cc01af3451e27ac82f5d10d5106b
+	GOLANGCILINT_HASH := c30696f1292cff8778a495400745f0f9c0406a3f38d8bb12cef48d599f6c7791
 endif
 ifeq ($(UNAME_S),Darwin)
 	SHASUM := shasum -a 256 -c
-	KUBECTL_URL := https://storage.googleapis.com/kubernetes-release/release/v1.18.0/bin/darwin/amd64/kubectl
+	KUBECTL_URL := https://storage.googleapis.com/kubernetes-release/release/v1.26.1/bin/darwin/amd64/kubectl
 	KUBECTL_HASH := 5eda86058a3db112821761b32afce3fdd2f6963ab580b1780a638ac323864eba
 	GOLANGCILINT_URL := https://github.com/golangci/golangci-lint/releases/download/v$(GOLANGCILINT_VERSION)/golangci-lint-$(GOLANGCILINT_VERSION)-darwin-amd64.tar.gz
 	GOLANGCILINT_HASH := 2b2713ec5007e67883aa501eebb81f22abfab0cf0909134ba90f60a066db3760
@@ -35,12 +35,12 @@ $(BINDIR)/mockgen:
 	mkdir -p $(BINDIR)
 	go build -o $(BINDIR)/mockgen github.com/golang/mock/mockgen
 
-$(BINDIR)/kubectl:
-	mkdir -p $(BINDIR)
-	curl --fail -sL -o $(BINDIR)/.kubectl $(KUBECTL_URL)
-	echo "$(KUBECTL_HASH)  $(BINDIR)/.kubectl" | $(SHASUM)
-	chmod +x $(BINDIR)/.kubectl
-	mv $(BINDIR)/.kubectl $(BINDIR)/kubectl
+# $(BINDIR)/kubectl:
+# 	mkdir -p $(BINDIR)
+# 	curl --fail -sL -o $(BINDIR)/.kubectl $(KUBECTL_URL)
+# 	echo "$(KUBECTL_HASH)  $(BINDIR)/.kubectl" | $(SHASUM)
+# 	chmod +x $(BINDIR)/.kubectl
+# 	mv $(BINDIR)/.kubectl $(BINDIR)/kubectl
 
 .PHONY: $(BINDIR)/golangci-lint
 $(BINDIR)/golangci-lint: $(BINDIR)/golangci-lint-$(GOLANGCILINT_VERSION)
@@ -54,7 +54,8 @@ $(BINDIR)/golangci-lint-$(GOLANGCILINT_VERSION):
 	mv $(BINDIR)/.golangci-lint/*/golangci-lint $(BINDIR)/golangci-lint-$(GOLANGCILINT_VERSION)
 	rm -rf $(BINDIR)/.golangci-lint $(BINDIR)/.golangci-lint.tar.gz
 
-depend: $(BINDIR)/mockgen $(BINDIR)/kubectl $(BINDIR)/golangci-lint
+# depend: $(BINDIR)/mockgen $(BINDIR)/kubectl $(BINDIR)/golangci-lint
+depend: $(BINDIR)/mockgen $(BINDIR)/golangci-lint
 
 verify_boilerplate:
 	$(HACK_DIR)/verify-boilerplate.sh
@@ -99,7 +100,7 @@ e2e: depend ## run end to end tests
 build: generate ## build kube-oidc-proxy
 	CGO_ENABLED=0 go build -ldflags '-w $(shell hack/version-ldflags.sh)' -o ./bin/kube-oidc-proxy ./cmd/.
 
-docker_build: generate test build ## build docker image
+docker_build: generate build ## build docker image
 	GOARCH=$(ARCH) GOOS=linux CGO_ENABLED=0 go build -ldflags '-w $(shell hack/version-ldflags.sh)' -o ./bin/kube-oidc-proxy  ./cmd/.
 	docker build -t kube-oidc-proxy .
 

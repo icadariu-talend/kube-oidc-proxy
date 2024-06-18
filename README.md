@@ -1,7 +1,9 @@
 # kube-oidc-proxy
 
+- This is a fork of [TremoloSecurity/kube-oidc-proxy](https://github.com/TremoloSecurity/kube-oidc-proxy) which is a fork of the now archive repo - `jetstack/kube-oidc-proxy`.
+
 `kube-oidc-proxy` is a reverse proxy server to authenticate users using OIDC to
-Kubernetes API servers where OIDC authentication is not available (i.e. managed 
+Kubernetes API servers where OIDC authentication is not available (i.e. managed
 Kubernetes providers such as GKE, EKS, etc).
 
 This intermediary server takes `kubectl` requests, authenticates the request using
@@ -13,7 +15,7 @@ OIDC authentication that are available with the Kubernetes API server as well as
 client flags provided by kubectl. In-cluster client authentication is also
 available when running `kube-oidc-proxy` as a pod.
 
-Since the proxy server utilises impersonation to forward requests to the API
+Since the proxy server utilizes impersonation to forward requests to the API
 server once authenticated, impersonation is disabled for user requests to the
 API server.
 
@@ -25,7 +27,7 @@ flow](https://storage.googleapis.com/kube-oidc-proxy/diagram-d9623e38a6cd3b585b4
 
 ## Quickest Start
 
-OpenUnison integrates kube-oidc-proxy directly, and includes an identity provider and access portal for Kubernetes.  The quickest way to get started with kube-oidc-proxy is to follow the directions for OpenUnison's deployment at https://openunison.github.io/.
+OpenUnison integrates kube-oidc-proxy directly, and includes an identity provider and access portal for Kubernetes.  The quickest way to get started with kube-oidc-proxy is to follow the directions for OpenUnison's deployment at <https://openunison.github.io/>.
 
 ## Tutorial
 
@@ -34,7 +36,7 @@ Directions on how to deploy OIDC authentication with multi-cluster can be found
 
 ### Quickstart
 
-Deployment yamls can be found in `./deploy/yaml` and will require configuration to
+Deployment yaml files can be found in `./deploy/yaml` and will require configuration to
 an exiting OIDC issuer.
 
 This quickstart demo will assume you have a Kubernetes cluster without OIDC
@@ -47,9 +49,9 @@ Firstly deploy `kube-oidc-proxy` and it's related resources into your cluster.
 This will create it's Deployment, Service Account and required permissions into
 the newly created `kube-oidc-proxy` Namespace.
 
-```
-$ kubectl apply -f ./deploy/yaml/kube-oidc-proxy.yaml
-$ kubectl get all --namespace kube-oidc-proxy
+```sh
+kubectl apply -f ./deploy/yaml/kube-oidc-proxy.yaml
+kubectl get all --namespace kube-oidc-proxy
 ```
 
 This deployment will fail until we create the required secrets. Notice we have
@@ -58,8 +60,8 @@ it's Service Account.
 
 We now wait until we have an external IP address provisioned.
 
-```
-$ kubectl get service --namespace kube-oidc-proxy
+```sh
+kubectl get service --namespace kube-oidc-proxy
 ```
 
 We need to generate certificates for `kube-oidc-proxy` to securely serve.  These
@@ -75,24 +77,23 @@ your address bar). Google's OIDC provider for example requires CAs from both
 `https://accounts.google.com/.well-known/openid-configuration` and
 `https://www.googleapis.com/oauth2/v3/certs`.
 
-
 Apply the secret manifests.
 
-```
+```sh
 kubectl apply -f ./deploy/yaml/secrets.yaml
 ```
 
 You can restart the `kube-oidc-proxy` pod to use these new secrets
 now they are available.
 
-```
+```sh
 kubectl delete pod --namespace kube-oidc-proxy kube-oidc-proxy-*
 ```
 
 Finally, create a Kubeconfig to point to `kube-oidc-proxy` and set up your OIDC
 authenticated Kubernetes user.
 
-```
+```yaml
 apiVersion: v1
 clusters:
 - cluster:
@@ -120,16 +121,17 @@ users:
 ```
 
 ## Configuration
- - [Token Passthrough](./docs/tasks/token-passthrough.md)
- - [No Impersonation](./docs/tasks/no-impersonation.md)
- - [Extra Impersonations Headers](./docs/tasks/extra-impersonation-headers.md)
- - [Auditing](./docs/tasks/auditing.md)
+
+- [Token Passthrough](./docs/tasks/token-passthrough.md)
+- [No Impersonation](./docs/tasks/no-impersonation.md)
+- [Extra Impersonations Headers](./docs/tasks/extra-impersonation-headers.md)
+- [Auditing](./docs/tasks/auditing.md)
 
 ## Logging
 
 In addition to auditing, kube-oidc-proxy logs all requests to standard out so the requests can be captured by a common Security Information and Event Management (SIEM) system.  SIEMs will typically import logs directly from containers via tools like fluentd.  This logging is also useful in debugging.  An example successful event:
 
-```
+```log
 [2021-11-25T01:05:17+0000] AuSuccess src:[10.42.0.5 / 10.42.1.3, 10.42.0.5] URI:/api/v1/namespaces/openunison/pods?limit=500 inbound:[mlbadmin1 / system:masters|system:authenticated /]
 ```
 
@@ -137,7 +139,7 @@ The first block, between `[]` is an ISO-8601 timestamp.  The next text, `AuSucce
 
 When there's an error or failure:
 
-```
+```log
 [2021-11-25T01:05:24+0000] AuFail src:[10.42.0.5 / 10.42.1.3] URI:/api/v1/nodes
 ```
 
@@ -155,14 +157,14 @@ kube-oidc-proxy supports the impersonation headers for inbound requests.  This a
 
 In addition to sending this `extra` information, the proxy adds an additional section to the logfile that will identify outbound identity data.  When impersonation headers are present, the `AuSuccess` log will look like:
 
-```
+```log
 [2021-11-25T01:05:17+0000] AuSuccess src:[10.42.0.5 / 10.42.1.3] URI:/api/v1/namespaces/openunison/pods?limit=500 inbound:[mlbadmin1 / system:masters|system:authenticated /] outbound:[mlbadmin2 / group2|system:authenticated /]
 ```
 
-When using `Impersonate-Extra-` headers, the proxy's `ServiceAccount` must be explicitly authorized via RBAC to impersonate whatever the extra key is named.  This is because extras are treated as subresources which must be explicitly authorized.  
-
+When using `Impersonate-Extra-` headers, the proxy's `ServiceAccount` must be explicitly authorized via RBAC to impersonate whatever the extra key is named.  This is because extras are treated as sub-resources which must be explicitly authorized.
 
 ## Development
+
 *NOTE*: building kube-oidc-proxy requires Go version 1.17 or higher.
 
 To help with development, there is a suite of tools you can use to deploy a

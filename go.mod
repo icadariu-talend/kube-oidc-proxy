@@ -11,7 +11,7 @@ require (
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/pflag v1.0.5
-	golang.org/x/term v0.14.0
+	golang.org/x/term v0.18.0
 	gopkg.in/square/go-jose.v2 v2.6.0
 	k8s.io/api v0.28.4
 	k8s.io/apimachinery v0.28.4
@@ -24,7 +24,7 @@ require (
 )
 
 replace (
-	github.com/emicklei/go-restful => github.com/emicklei/go-restful/v3 v3.8.0
+	github.com/emicklei/go-restful => github.com/emicklei/go-restful/v3 v3.10.0
 	golang.org/x/crypto => golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa
 
 	gopkg.in/yaml.v3 => gopkg.in/yaml.v3 v3.0.1
@@ -109,13 +109,13 @@ require (
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.19.0 // indirect
-	golang.org/x/crypto v0.15.0 // indirect
+	golang.org/x/crypto v0.21.0 // indirect
 	golang.org/x/exp v0.0.0-20220722155223-a9213eeb770e // indirect
 	golang.org/x/mod v0.12.0 // indirect
-	golang.org/x/net v0.18.0 // indirect
+	golang.org/x/net v0.23.0 // indirect
 	golang.org/x/oauth2 v0.11.0 // indirect
 	golang.org/x/sync v0.3.0 // indirect
-	golang.org/x/sys v0.14.0 // indirect
+	golang.org/x/sys v0.18.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	golang.org/x/tools v0.12.0 // indirect

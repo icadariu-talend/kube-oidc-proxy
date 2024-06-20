@@ -4,6 +4,7 @@ HACK_DIR  ?= hack
 PATH      := $(BINDIR):$(PATH)
 ARTIFACTS ?= artifacts
 ARCH      ?= amd64
+APPVER    ?= latest
 
 SHELL = /bin/bash -o pipefail
 
@@ -102,7 +103,7 @@ build: generate ## build kube-oidc-proxy
 
 docker_build: generate build ## build docker image
 	GOARCH=$(ARCH) GOOS=linux CGO_ENABLED=0 go build -ldflags '-w $(shell hack/version-ldflags.sh)' -o ./bin/kube-oidc-proxy  ./cmd/.
-	docker build -t kube-oidc-proxy .
+	docker build -t icadariuqlik/kube-oidc-proxy:$(APPVER) .
 
 all: test build ## runs tests, build
 

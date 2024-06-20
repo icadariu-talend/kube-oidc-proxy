@@ -1,10 +1,11 @@
 # Copyright Jetstack Ltd. See LICENSE for details.
-BINDIR    ?= $(CURDIR)/bin
-HACK_DIR  ?= hack
-PATH      := $(BINDIR):$(PATH)
-ARTIFACTS ?= artifacts
-ARCH      ?= amd64
-APPVER    ?= latest
+BINDIR    	?= $(CURDIR)/bin
+HACK_DIR  	?= hack
+PATH      	:= $(BINDIR):$(PATH)
+ARTIFACTS 	?= artifacts
+ARCH      	?= amd64
+APPVER    	?= latest
+REPOSITORY 	?= dockerhub
 
 SHELL = /bin/bash -o pipefail
 
@@ -36,12 +37,12 @@ $(BINDIR)/mockgen:
 	mkdir -p $(BINDIR)
 	go build -o $(BINDIR)/mockgen github.com/golang/mock/mockgen
 
-# $(BINDIR)/kubectl:
-# 	mkdir -p $(BINDIR)
-# 	curl --fail -sL -o $(BINDIR)/.kubectl $(KUBECTL_URL)
-# 	echo "$(KUBECTL_HASH)  $(BINDIR)/.kubectl" | $(SHASUM)
-# 	chmod +x $(BINDIR)/.kubectl
-# 	mv $(BINDIR)/.kubectl $(BINDIR)/kubectl
+$(BINDIR)/kubectl:
+	mkdir -p $(BINDIR)
+	curl --fail -sL -o $(BINDIR)/.kubectl $(KUBECTL_URL)
+	echo "$(KUBECTL_HASH)  $(BINDIR)/.kubectl" | $(SHASUM)
+	chmod +x $(BINDIR)/.kubectl
+	mv $(BINDIR)/.kubectl $(BINDIR)/kubectl
 
 .PHONY: $(BINDIR)/golangci-lint
 $(BINDIR)/golangci-lint: $(BINDIR)/golangci-lint-$(GOLANGCILINT_VERSION)
@@ -103,7 +104,7 @@ build: generate ## build kube-oidc-proxy
 
 docker_build: generate build ## build docker image
 	GOARCH=$(ARCH) GOOS=linux CGO_ENABLED=0 go build -ldflags '-w $(shell hack/version-ldflags.sh)' -o ./bin/kube-oidc-proxy  ./cmd/.
-	docker build -t icadariuqlik/kube-oidc-proxy:$(APPVER) .
+	docker build -t $(REPOSITORY):$(APPVER) .
 
 all: test build ## runs tests, build
 
